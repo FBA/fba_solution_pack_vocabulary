@@ -1,0 +1,143 @@
+<?php
+
+/**
+ * @file
+ * FBA Vocabulary solution pack module
+ */
+
+/**
+ * FBA vocabulary sp required fedora objects.
+ *
+ * @return array
+ */
+function fba_vocab_sp_required_fedora_objects() {
+  module_load_include('inc', 'fedora_repository', 'fedora_repository.solutionpacks');
+
+  return array(
+    'fba_vocab_sp' => array(
+      'module' => 'fba_vocab_sp',
+      'title' => 'FBA Vocabulary Solution Pack',
+      'objects' => array(
+      ),
+    ),
+  );
+}
+
+function _get_pid_from_authority($authority) {
+  //get the pid from the authority/variant
+  $solrsearchterm = 'mads.authority:"' . trim($authority) . '" OR mads.variant:"' . trim($authority) . '"';
+  $solrresult = _perform_solr_search($solrsearchterm);
+  $rawresponse = $solrresult->getRawResponse();
+  $resarray = json_decode($rawresponse, TRUE);
+  $resdocs = $resarray['response']['docs'];
+  $foreignpid = $resdocs[0][PID];
+  return $foreignpid;
+}
+
+function _get_html_string_of_object_urls($terms) {
+  global $base_url;
+  $tempstring = '';
+  if (is_array($terms)) {
+    foreach ($terms as $term) {
+      $termpid = _get_pid_from_authority($term);
+      // A quick catch, so that an invalid url isn't put out as a link
+      if ($termpid != NULL) {
+        $tempstring.='<a href="' . $base_url . '/fedora/repository/' . $termpid . '">' . $term . '</a>' . '<br/>';
+      }
+      else {
+        $tempstring.= $term;
+      }
+    }
+  }
+  else {
+    $termpid = _get_pid_from_authority($terms);
+    // A quick catch, so that an invalid url isn't put out as a link
+    if ($termpid != NULL) {
+      $tempstring.='<a href="' . $base_url . '/fedora/repository/' . $termpid . '">' . $terms . '</a>' . '<br/>';
+    }
+    else {
+      $tempstring.= $term;
+    }
+  }
+  return $tempstring;
+}
+
+/**
+ * Blatantly ripped from apachesolr_views_query function build.
+ * NB assumes solr is on localhost:8080.
+ *
+ * @param string $queryparam
+ *   to be passed within formatted solr query as 'q'
+ *
+ * @return array
+ *   listing all appropriate results
+ */
+function _perform_solr_search($queryparam = 'dummy') {
+
+  // TODO: needs tidying.
+  // encode the queryparam?
+
+  $params = array();
+  $params['rows'] = 50;
+  $params['start'] = 0;
+  $params['indent'] = 'on';
+  $params['q'] = $queryparam;
+  $params['version'] = '2.2';
+
+  $params['fl'] = "*";
+  $params['qt'] = "standard";
+  $params['wt'] = "json";
+  $params['hl'] = "true";
+  $params['hl.fl'] = "dc.type";
+
+  // If we display all items without pager.
+  if ($params['rows'] == 0) {
+    $params['rows'] = 1000000;
+  }
+
+  // Add filters to parameters.
+  if (isset($params['filters'])) {
+    $params['fq'] = $params['filters'];
+  }
+
+  // Add sorting.
+  if (isset($params['sort'])) {
+    // Populate sorting parameters.
+    foreach ($params['sort'] as $field => $order) {
+      $params['sort'][] = $field . ' ' . $order;
+    }
+  }
+
+  // Set query.
+  $dismax = NULL;
+  if (isset($params['q'])) {
+    // Query.
+    $query = $params['q'];
+
+    // Dismax.
+    if (isset($params['defType']) AND $params['defType'] == 'dismax') {
+      $dismax = $params['defType'];
+      // If no qf fields are specified in the requestHandler
+      // a default list is supplied here for dismax searches.
+      $params['qf'] = 'dc.title^5 dc.subject^2 dc.description^2 dc.creator^2 dc.contributor^1 dc.type';
+    }
+  }
+  else {
+    $query = '*:*';
+  }
+
+  $url = variable_get('islandora_solr_search_block_url', 'http://localhost:8080/solr');
+  $pathparts = parse_url($url);
+
+  $solr = new Apache_Solr_Service($pathparts['host'], $pathparts['port'], $pathparts['path'] . '/');
+  $solr->setCreateDocuments(0);
+
+  // This is where the query gets executed and output starts being created.
+  try {
+    $results = $solr->search($query, $params['start'], $params['rows'], $params);
+  } catch (Exception $e) {
+    drupal_set_message(t('_perform_solr_search :: ') . $e->getMessage());
+  }
+
+  return $results;
+}
