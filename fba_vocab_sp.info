@@ -1,7 +1,9 @@
 name = FBA Vocabulary Solution Pack
-description = A custom FBA Module to show custom formatted object detail tab
+description = A custom FBA Module to show custom formatted object detail tab for vocab and geo terms
 package = FBA Solution Pack
 version = 6.x-13.1
 core = 6.x
 dependencies[] = fedora_repository
+dependencies[] = islandora_content_model_forms
+
 
