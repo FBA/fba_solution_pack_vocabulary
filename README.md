@@ -11,7 +11,7 @@ fba_solution_pack_geovocab/xml/cmodel folder.
 
 The installation of the "FBA Object Linker Module" is a prerequisite for the "FBA Vocabulary Module".
 The installation instructions for it can be found at:
-https://github.com/FBA/islandora_autocomplete/blob/6.x/modules/sparql/README
+https://github.com/FBA/islandora_autocomplete/blob/6.x/modules/sparql/README.md
 
 It is necessary to load rows into the existing islandora_autocomplete table and
 the islandora_autocomplete_sparql table, which has been created by the installation
