@@ -110,38 +110,6 @@ class FBAVocabSolutionPack {
           }
         }
       }
-
-      //We don't do anything with recordCreationDate/recordChangeDate at the moment
-      //but here's the code just in case
-      //      $recordInfo = $MADSDom->getElementsByTagName('recordInfo')->item(0);
-      //      if ($recordInfo->hasChildNodes()) {
-      //        foreach ($recordInfo->childNodes as $p) {
-      //          $nname = $p->nodeName;
-      //nname might have "mads:" prefix on it. If so, remove.
-      //          $pos = strpos($nname, 'mads:');
-      //          if ($pos === false) {
-      //thats ok, mads: wasn't a prefix
-      //          }
-      //          else {
-      //            $nname = substr($nname, 5); //5 is length of 'mads:'
-      //          }
-      //          switch ($nname) {
-      //            case 'recordCreationDate': {
-      //                break;
-      //              }
-      //            case 'recordChangeDate': {
-      //                break;
-      //              }
-      //            default: {
-      //                break;
-      //              }
-      //          }
-      //        }
-      //      }
-      //      else {
-      //placeholder
-      //      }
-      // End of paragraph
     }
 
     $output = array(); //this will be the formatted html to be sent to the screen
@@ -225,19 +193,10 @@ class FBAVocabSolutionPack {
       }
       $formattedhtml .= '</p>';
 
-      // START OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
-      // Search for reciprocal links in geo collection
-      // and also for links to PDF objects.
+      // Search for reciprocal links in geo collection.
 
       $linkGeoHeader = 'Related geographic terms';
       $linkGeoSparqlQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:geopref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:geopref_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title LIMIT 30';
-      //SFOX
-      //$linkGeoFormattedHtml = get_link_list($linkGeoHeader, $linkGeoSparqlQuery);
-      //if (strlen($linkGeoFormattedHtml) > 0) {
-      //$customLinkFormattedHtml = '<div style="clear:both">' . $linkGeoFormattedHtml . '</div>';
-      //$formattedhtml .= $customLinkFormattedHtml;
-      //}
-
       $linkGeoArray = get_link_array($linkGeoSparqlQuery);
 
       if ($linkGeoArray) {
@@ -260,7 +219,6 @@ class FBAVocabSolutionPack {
 
         $formattedhtml .= '</p></div>';
       }
-      // END OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
     }
     else {
       // The custom section for a non-preferred term
@@ -273,31 +231,63 @@ class FBAVocabSolutionPack {
     //Common footer section for both types of terms
     $formattedhtml .= '<p><strong>Approved Date</strong><br/>' . $dateapproved . '</p>';
 
-    // START OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
-    // Determine whether this object is a vocab or geo object
-    // and then search for reciprocal links in vocab or geo
-    // collections and also for links to PDF objects.
-
-    $linkPDFHeader = 'Objects having keyword relationship to this Vocabulary Term';
-    $linkPDFSparqlQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/islandora:sp_strict_pdf>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/islandora:sp_pdf_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasKeyword> <info:fedora/' . $this->pid . '> } ORDER BY ?title LIMIT 30';
-    $linkPDFFormattedHtml = get_link_list($linkPDFHeader, $linkPDFSparqlQuery);
-
-    if (strlen($linkPDFFormattedHtml) > 0) {
-      $customLinkFormattedHtml = '<div style="clear:both">' . $linkPDFFormattedHtml . '</div>';
-      $formattedhtml .= $customLinkFormattedHtml;
-    }
-
-    // END OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
-
-    $formattedhtml .= '<p><a href="mailto:dis@fba.org.uk?Subject=DTC%20Vocab%20enquiry%20-%20';
     if ($authority) {
-      $formattedhtml .= rawurlencode($authority);
-    }
-    else {
-      $formattedhtml .= rawurlencode($variant);
+      /* If a drupal multisite is pointing at one fedora repository,       */
+      /* and control over which items are displayed on specific websites   */
+      /* is required, include the base URL of all the websites that should */
+      /* display links in the following switch-clause, and remove the      */
+      /* processing in the 'default:' branch.                              */
+
+      switch ($base_url) {
+        case "http://toplevelsite.org":
+        case "http://specificsite.org":
+          /* To avoid Sparql queries becoming overly complex, when a new     */
+          /* website has to be catered for, just add another header/query    */
+          /* pair to the array for the particular website.                   */
+          /* Replace http://toplevelsite.org with the base URL of the site   */
+          /* that is to display all the links and repeat the entire if-clause*/
+          /* below for each specific site that should display links for      */
+          /* a particular collection. Also set the relevant collection ids,  */
+          /* content model ids and predicates.                               */
+          /* So, for each website repeat the entire if-clause STARTING HERE: */
+
+          if (!strcmp($base_url, "http://specificsite.org") || !strcmp($base_url, "http://toplevelsite.org") ) {
+
+            if (!strcmp($base_url, "http://toplevelsite.org")) {
+              $linkHeader = 'Specific Site items having a keyword relationship to this subject term';
+            }
+            elseif (!strcmp($base_url, "http://specificsite.org")) {
+              $linkHeader = 'Items having a keyword relationship to this subject term';
+            }
+            $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://specific_predicate> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "specific_namespace:collection", "i") && (regex(str(?model), "specific_namespace:specific_content_model1", "i") || regex(str(?model), "specific_namespace:specific_content_model2", "i") || regex(str(?model), "specific_namespace:specific_content_model3", "i")))} ORDER BY $title LIMIT 300';
+
+            $linkSparqlQueries[] = array("header" => $linkHeader, "query" => $linkQuery);
+          }
+
+          /* ... AND FINISHING HERE  */
+          break;
+        default:
+          /* This is the default processing that works for the collection id  */
+          /* and content model id associated with the standard Islandora      */
+          /* PDF Solution Pack. Remove the processing in this branch and      */
+          /* follow the instructions above if non-standard processing is      */
+          /* required.                                                        */
+
+          $linkHeader = 'PDFs having a keyword relationship to this subject term';
+          $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasKeyword> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "islandora:sp_pdf_collection", "i") && regex(str(?model), "islandora:sp_strict_pdf", "i"))} ORDER BY $title LIMIT 300';
+          $linkSparqlQueries[] = array("header" => $linkHeader, "query" => $linkQuery);
+      }
+
+      foreach ($linkSparqlQueries as $linkSparqlQuery) { 
+        $linkFormattedHtml = get_link_list($linkSparqlQuery['header'], $linkSparqlQuery['query']);
+
+        if (strlen($linkFormattedHtml) > 0) {
+          $customLinkFormattedHtml = '<div style="clear:both">' . $linkFormattedHtml . '</div>';
+          $formattedhtml .= $customLinkFormattedHtml;
+        }
+      }
     }
 
-    $formattedhtml .= ' ">Click here to give feedback on this term or suggest an update.</a></p>';
     $output[] = array($formattedhtml);
     $dataStreamBody = theme('table', $headers, $output);
 
@@ -417,38 +407,6 @@ class FBAVocabSolutionPack {
           }
         }
       }
-
-      //We don't do anything with recordCreationDate/recordChangeDate at the moment
-      //but here's the code just in case
-      //      $recordInfo = $MADSDom->getElementsByTagName('recordInfo')->item(0);
-      //      if ($recordInfo->hasChildNodes()) {
-      //        foreach ($recordInfo->childNodes as $p) {
-      //          $nname = $p->nodeName;
-      //nname might have "mads:" prefix on it. If so, remove.
-      //          $pos = strpos($nname, 'mads:');
-      //          if ($pos === false) {
-      //thats ok, mads: wasn't a prefix
-      //          }
-      //          else {
-      //            $nname = substr($nname, 5); //5 is length of 'mads:'
-      //          }
-      //          switch ($nname) {
-      //            case 'recordCreationDate': {
-      //                break;
-      //              }
-      //            case 'recordChangeDate': {
-      //                break;
-      //              }
-      //            default: {
-      //                break;
-      //              }
-      //          }
-      //        }
-      //      }
-      //      else {
-      //placeholder
-      //      }
-      // End of paragraph
     }
 
     $output = array(); //this will be the formatted html to be sent to the screen
@@ -557,20 +515,12 @@ class FBAVocabSolutionPack {
         $formattedhtml .= 'N/A';
       }
 
-      // START OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
       // Search for reciprocal links in vocab collection
       // and also for links to PDF objects.
       module_load_include('inc', 'islandora_content_model_forms', 'ObjectLinker');
 
       $linkVocabHeader = 'Related subject terms';
       $linkVocabSparqlQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:vocabpref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:vocabpref_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title LIMIT 30';
-      //SFOX
-      //$linkVocabFormattedHtml = get_link_list($linkVocabHeader, $linkVocabSparqlQuery);
-      //if (strlen($linkVocabFormattedHtml) > 0) {
-      //$customLinkFormattedHtml = '<div style="clear:both">' . $linkVocabFormattedHtml . '</div>';
-      //$formattedhtml .= $customLinkFormattedHtml;
-      //}
-      //SFOX
 
       $linkVocabArray = get_link_array($linkVocabSparqlQuery);
 
@@ -595,26 +545,7 @@ class FBAVocabSolutionPack {
         $formattedhtml .= '</p></div>';
       }
 
-      // END OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
-
       $formattedhtml .= '</p>';
-
-
-
-      // START OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
-      // Determine whether this object is a vocab or geo object
-      // and then search for reciprocal links in vocab or geo
-      // collections and also for links to PDF objects.
-
-      $linkPDFHeader = 'Objects having keyword relationship to this Vocabulary Term';
-      $linkPDFSparqlQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/islandora:sp_strict_pdf>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/islandora:sp_pdf_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasGeographicKeyword> <info:fedora/' . $this->pid . '> } ORDER BY ?title LIMIT 30';
-      $linkPDFFormattedHtml = get_link_list($linkPDFHeader, $linkPDFSparqlQuery);
-
-      if (strlen($linkPDFFormattedHtml) > 0) {
-        $customLinkFormattedHtml = '<div style="clear:both">' . $linkPDFFormattedHtml . '</div>';
-        $formattedhtml .= $customLinkFormattedHtml;
-      }
-      // END OF CODE THAT PRODUCES DEPENDENCY ON OBJECT LINKER
     }
     else {
       // The custom section for a non-preferred term
@@ -627,14 +558,63 @@ class FBAVocabSolutionPack {
     //Common footer section for both types of terms
     $formattedhtml .= '<p><strong>Approved Date</strong><br/>' . $dateapproved . '</p>';
 
-    $formattedhtml .= '<p><a href="mailto:dis@fba.org.uk?Subject=DTC%20Vocab%20enquiry%20-%20';
     if ($authority) {
-      $formattedhtml .= rawurlencode($authority);
+      /* If a drupal multisite is pointing at one fedora repository,       */
+      /* and control over which items are displayed on specific websites   */
+      /* is required, include the base URL of all the websites that should */
+      /* display links in the following switch-clause, and remove the      */
+      /* processing in the 'default:' branch.                              */
+
+      switch ($base_url) {
+        case "http://toplevelsite.org":
+        case "http://specificsite.org":
+          /* To avoid Sparql queries becoming overly complex, when a new     */
+          /* website has to be catered for, just add another header/query    */
+          /* pair to the array for the particular website.                   */
+          /* Replace http://toplevelsite.org with the base URL of the site   */
+          /* that is to display all the links and repeat the entire if-clause*/
+          /* below for each specific site that should display links for      */
+          /* a particular collection. Also set the relevant collection ids,  */
+          /* content model ids and predicates.                               */
+          /* So, for each website repeat the entire if-clause STARTING HERE: */
+
+          if (!strcmp($base_url, "http://specificsite.org") || !strcmp($base_url, "http://toplevelsite.org") ) {
+
+            if (!strcmp($base_url, "http://toplevelsite.org")) {
+              $linkHeader = 'Specific Site items having a keyword relationship to this geographic term';
+            }
+            elseif (!strcmp($base_url, "http://specificsite.org")) {
+              $linkHeader = 'Items having a keyword relationship to this geographic term';
+            }
+            $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://specific_predicate> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "specific_namespace:collection", "i") && (regex(str(?model), "specific_namespace:specific_content_model1", "i") || regex(str(?model), "specific_namespace:specific_content_model2", "i") || regex(str(?model), "specifici_namespace:specific_content_model3", "i")))} ORDER BY $title LIMIT 300';
+
+            $linkSparqlQueries[] = array("header" => $linkHeader, "query" => $linkQuery);
+          }
+
+          /* ... AND FINISHING HERE  */
+          break;
+        default:
+          /* This is the default processing that works for the collection id  */
+          /* and content model id associated with the standard Islandora      */
+          /* PDF Solution Pack. Remove the processing in this branch and      */
+          /* follow the instructions above if non-standard processing is      */
+          /* required.                                                        */
+
+          $linkHeader = 'PDFs having a keyword relationship to this geographic term';
+          $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasGeographicKeyword> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "islandora:sp_pdf_collection", "i") && regex(str(?model), "islandora:sp_strict_pdf", "i"))} ORDER BY $title LIMIT 300';
+          $linkSparqlQueries[] = array("header" => $linkHeader, "query" => $linkQuery);
+      }
+
+      foreach ($linkSparqlQueries as $linkSparqlQuery) { 
+        $linkFormattedHtml = get_link_list($linkSparqlQuery['header'], $linkSparqlQuery['query']);
+
+        if (strlen($linkFormattedHtml) > 0) {
+          $customLinkFormattedHtml = '<div style="clear:both">' . $linkFormattedHtml . '</div>';
+          $formattedhtml .= $customLinkFormattedHtml;
+        }
+      }
     }
-    else {
-      $formattedhtml .= rawurlencode($variant);
-    }
-    $formattedhtml .= ' ">Click here to give feedback on this term or suggest an update.</a></p>';
+
     $output[] = array($formattedhtml);
     $dataStreamBody = theme('table', $headers, $output);
 
@@ -651,6 +631,5 @@ class FBAVocabSolutionPack {
 
     return $tabset;
   }
-
 }
 
