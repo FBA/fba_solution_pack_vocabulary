@@ -195,7 +195,7 @@ class FBAVocabSolutionPack {
 
       // Search for reciprocal links in geo collection.
 
-      $linkGeoHeader = 'Related geographic terms';
+      $linkGeoHeader = 'Correlative geographic terms';
       $linkGeoSparqlQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:geopref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:geopref_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title LIMIT 30';
       $linkGeoArray = get_link_array($linkGeoSparqlQuery);
 
@@ -254,10 +254,10 @@ class FBAVocabSolutionPack {
           if (!strcmp($base_url, "http://specificsite.org") || !strcmp($base_url, "http://toplevelsite.org") ) {
 
             if (!strcmp($base_url, "http://toplevelsite.org")) {
-              $linkHeader = 'Specific Site items having a keyword relationship to this subject term';
+              $linkHeader = '<b>Specific Site items having a keyword relationship to this subject term</b>';
             }
             elseif (!strcmp($base_url, "http://specificsite.org")) {
-              $linkHeader = 'Items having a keyword relationship to this subject term';
+              $linkHeader = '<b>Items having a keyword relationship to this subject term</b>';
             }
             $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://specific_predicate> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/specific_namespace:collection$", "i") && (regex(str(?model), "^info:fedora/specific_namespace:specific_content_model1$", "i") || regex(str(?model), "^info:fedora/specific_namespace:specific_content_model2$", "i") || regex(str(?model), "^info:fedora/specific_namespace:specific_content_model3$", "i")))} ORDER BY $title LIMIT 300';
 
@@ -273,7 +273,7 @@ class FBAVocabSolutionPack {
           /* follow the instructions above if non-standard processing is      */
           /* required.                                                        */
 
-          $linkHeader = 'PDFs having a keyword relationship to this subject term';
+          $linkHeader = '<b>PDFs having a keyword relationship to this subject term</b>';
           $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasKeyword> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/islandora:sp_pdf_collection$", "i") && regex(str(?model), "^info:fedora/islandora:sp_strict_pdf$", "i"))} ORDER BY $title LIMIT 300';
           $linkSparqlQueries[] = array("header" => $linkHeader, "query" => $linkQuery);
       }
@@ -519,7 +519,7 @@ class FBAVocabSolutionPack {
       // and also for links to PDF objects.
       module_load_include('inc', 'islandora_content_model_forms', 'ObjectLinker');
 
-      $linkVocabHeader = 'Related subject terms';
+      $linkVocabHeader = 'Correlative subject terms';
       $linkVocabSparqlQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:vocabpref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:vocabpref_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title LIMIT 30';
 
       $linkVocabArray = get_link_array($linkVocabSparqlQuery);
@@ -581,10 +581,10 @@ class FBAVocabSolutionPack {
           if (!strcmp($base_url, "http://specificsite.org") || !strcmp($base_url, "http://toplevelsite.org") ) {
 
             if (!strcmp($base_url, "http://toplevelsite.org")) {
-              $linkHeader = 'Specific Site items having a keyword relationship to this geographic term';
+              $linkHeader = '<b>Specific Site items having a keyword relationship to this geographic term</b>';
             }
             elseif (!strcmp($base_url, "http://specificsite.org")) {
-              $linkHeader = 'Items having a keyword relationship to this geographic term';
+              $linkHeader = '<b>Items having a keyword relationship to this geographic term</b>';
             }
             $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://specific_predicate> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/specific_namespace:collection$", "i") && (regex(str(?model), "^info:fedora/specific_namespace:specific_content_model1$", "i") || regex(str(?model), "^info:fedora/specific_namespace:specific_content_model2$", "i") || regex(str(?model), "^info:fedora:specifici_namespace:specific_content_model3$", "i")))} ORDER BY $title LIMIT 300';
 
@@ -600,7 +600,7 @@ class FBAVocabSolutionPack {
           /* follow the instructions above if non-standard processing is      */
           /* required.                                                        */
 
-          $linkHeader = 'PDFs having a keyword relationship to this geographic term';
+          $linkHeader = '<b>PDFs having a keyword relationship to this geographic term</b>';
           $linkQuery = 'SELECT ?title ?object WHERE { ?object <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasGeographicKeyword> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/islandora:sp_pdf_collection$", "i") && regex(str(?model), "^info:fedora/islandora:sp_strict_pdf$", "i"))} ORDER BY $title LIMIT 300';
           $linkSparqlQueries[] = array("header" => $linkHeader, "query" => $linkQuery);
       }
