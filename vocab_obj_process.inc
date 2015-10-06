@@ -229,7 +229,7 @@ class FBAVocabSolutionPack {
       // Search for reciprocal links in geo collection.
 
       $linkGeoHeader = 'Correlative geographic terms';
-      $linkGeoSparqlQuery = 'SELECT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:geopref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:geopref_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title';
+      $linkGeoSparqlQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:geopref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:geopref_collection>; <' . FBA_URI .'hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title';
       $linkGeoArray = get_link_array($linkGeoSparqlQuery);
 
       if ($linkGeoArray) {
@@ -266,7 +266,7 @@ class FBAVocabSolutionPack {
     $formattedhtml .= '<p><strong>Approved Date</strong><br/>' . $dateapproved . '</p>';
 
     if ($authority) {
-      $predicate = 'http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasKeyword';
+      $predicate = FBA_URI . 'hasKeyword';
       $header = 'Items having a keyword or observed-property relationship to this subject term';
       $this->createListOfLinks($predicate, $header, $formattedhtml);
     }
@@ -546,7 +546,7 @@ class FBAVocabSolutionPack {
       module_load_include('inc', 'islandora_content_model_forms', 'ObjectLinker');
 
       $linkVocabHeader = 'Correlative subject terms';
-      $linkVocabSparqlQuery = 'SELECT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:vocabpref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:vocabpref_collection>; <http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title';
+      $linkVocabSparqlQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:vocabpref_CModel>; <fedora-rels-ext:isMemberOfCollection> <info:fedora/fba:vocabpref_collection>; <' . FBA_URI . 'hasCorrelative> <info:fedora/' . $this->pid . '> } ORDER BY ?title';
 
       $linkVocabArray = get_link_array($linkVocabSparqlQuery);
 
@@ -586,7 +586,7 @@ class FBAVocabSolutionPack {
     $formattedhtml .= '<p><strong>Approved Date</strong><br/>' . $dateapproved . '</p>';
 
     if ($authority) {
-      $predicate = 'http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasGeographicKeyword';
+      $predicate = FBA_URI . 'hasGeographicKeyword';
       $header = 'Items having a keyword relationship to this geographic term';
       $this->createListOfLinks($predicate, $header, $formattedhtml);
     }
@@ -656,12 +656,12 @@ class FBAVocabSolutionPack {
           /* that have to be private due to reasons of copyright or whatever.*/
 
           if (!strcmp($base_url, $ea_greylit) || !strcmp($base_url, $data_local) || !strcmp($base_url, $env_data)) {
-            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/ealit:collection$", "i") && (regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i") || regex(str(?model), "^info:fedora/fba:library_article_cmodel$", "i") || regex(str(?model), "^info:fedora/fba:library_chapter_cmodel$", "i")))}';
+            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/ealit:collection$", "i") && (regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i") || regex(str(?model), "^info:fedora/fba:library_article_cmodel$", "i") || regex(str(?model), "^info:fedora/fba:library_chapter_cmodel$", "i")))}';
             $linkArray = get_link_array($linkQuery);
           }
 
           if (!strcmp($base_url, $a_salmon_t) || !strcmp($base_url, $data_local) || !strcmp($base_url, $env_data)) {
-            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:library_monograph_cmodel>; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/xastj:collection$", "i") || regex(str(?collection), "^info:fedora/xastbb:collection$", "i") || regex(str(?collection), "^info:fedora/xastsacr:collection$", "i"))}';
+            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> <info:fedora/fba:library_monograph_cmodel>; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/xastj:collection$", "i") || regex(str(?collection), "^info:fedora/xastbb:collection$", "i") || regex(str(?collection), "^info:fedora/xastsacr:collection$", "i"))}';
             $linkAstArray = get_link_array($linkQuery);
             if (count($linkAstArray)) {
               if (count($linkArray)) {
@@ -688,10 +688,11 @@ class FBAVocabSolutionPack {
              * in the list.
              */
 
-            if (!strcmp($predicate, 'http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasKeyword')) {
-              $linkQuery = 'SELECT DISTINCT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-rels-ext:isMemberOfCollection> ?collection; ?predicate <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/dtcwensum:collection$", "i") || regex(str(?collection), "^info:fedora/dtceden:collection$", "i") || regex(str(?collection), "^info:fedora/dtcavon:collection$", "i") || regex(str(?collection), "^info:fedora/ghgno:collection$", "i") || regex(str(?collection), "^info:fedora/ghgch:collection$", "i") || regex(str(?collection), "^info:fedora/fbads:collection$", "i")) && (regex(str(?predicate), "^http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasKeyword$", "i") || regex(str(?predicate), "^http://fba.org.uk/schemas/fba/fba_rdf/1.0.0/hasObservedProperty$", "i")))}';
+            $fbaKeywordURI = FBA_URI . 'hasKeyword';
+            if (!strcmp($predicate, $fbaKeywordURI)) {
+              $linkQuery = 'SELECT DISTINCT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-rels-ext:isMemberOfCollection> ?collection; ?predicate <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/dtcwensum:collection$", "i") || regex(str(?collection), "^info:fedora/dtceden:collection$", "i") || regex(str(?collection), "^info:fedora/dtcavon:collection$", "i") || regex(str(?collection), "^info:fedora/ghgno:collection$", "i") || regex(str(?collection), "^info:fedora/ghgch:collection$", "i") || regex(str(?collection), "^info:fedora/fbads:collection$", "i")) && (regex(str(?predicate), "^' . FBA_URI . 'hasKeyword$", "i") || regex(str(?predicate), "^' . FBA_URI . 'hasObservedProperty$", "i")))}';
             } else {
-              $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/dtcwensum:collection$", "i") || regex(str(?collection), "^info:fedora/dtceden:collection$", "i") || regex(str(?collection), "^info:fedora/dtcavon:collection$", "i") || regex(str(?collection), "^info:fedora/ghgno:collection$", "i") || regex(str(?collection), "^info:fedora/ghgch:collection$", "i") || regex(str(?collection), "^info:fedora/fbads:collection$", "i"))}';
+              $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/dtcwensum:collection$", "i") || regex(str(?collection), "^info:fedora/dtceden:collection$", "i") || regex(str(?collection), "^info:fedora/dtcavon:collection$", "i") || regex(str(?collection), "^info:fedora/ghgno:collection$", "i") || regex(str(?collection), "^info:fedora/ghgch:collection$", "i") || regex(str(?collection), "^info:fedora/fbads:collection$", "i"))}';
             }
             $linkAedaArray =  get_link_array($linkQuery);
             if (count($linkAedaArray)) {
@@ -702,7 +703,7 @@ class FBAVocabSolutionPack {
               }
             }
 
-            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <http://purl.org/dc/elements/1.1/title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbaiasub:1695$", "i") || regex(str(?collection), "^info:fedora/fbaia:83$", "i") || regex(str(?collection), "^info:fedora/yyy:collection$", "i")) && (regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i") || regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i")))}';
+            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbaiasub:1695$", "i") || regex(str(?collection), "^info:fedora/fbaia:83$", "i") || regex(str(?collection), "^info:fedora/yyy:collection$", "i")) && (regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i") || regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i")))}';
             $linkFbaiaAndEprintArray = get_link_array($linkQuery);
             if (count($linkFbaiaAndEprintArray)) {
               if (count($linkArray)) {
