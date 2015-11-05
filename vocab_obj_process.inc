@@ -703,7 +703,7 @@ class FBAVocabSolutionPack {
               }
             }
 
-            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbaiasub:1695$", "i") || regex(str(?collection), "^info:fedora/fbaia:83$", "i") || regex(str(?collection), "^info:fedora/yyy:collection$", "i")) && (regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i") || regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i")))}';
+            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbaiasub:1695$", "i") || regex(str(?collection), "^info:fedora/fbaia:1697$", "i") || regex(str(?collection), "^info:fedora/fbaia:1700$", "i") || regex(str(?collection), "^info:fedora/fbaia:83$", "i") || regex(str(?collection), "^info:fedora/yyy:collection$", "i")) && (regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i") || regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i")))}';
             $linkFbaiaAndEprintArray = get_link_array($linkQuery);
             if (count($linkFbaiaAndEprintArray)) {
               if (count($linkArray)) {
