@@ -655,9 +655,33 @@ class FBAVocabSolutionPack {
           /* ALL data can be viewed i.e. including objects and datastreams   */
           /* that have to be private due to reasons of copyright or whatever.*/
 
+          if (!strcmp($base_url, $data_local)) {
+            // This branching for data_local on its own is
+            // temporary. Once all the images associated
+            // with the Chara genus have been entered
+            // the fbafc:collection can be added to the
+            // sparql query executed for data_local and env_data.
+            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbafc:collection$", "i")) && regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i"))}';
+            $linkFbaiaAndEprintArray = get_link_array($linkQuery);
+            if (count($linkFbaiaAndEprintArray)) {
+              if (count($linkArray)) {
+                $linkArray = array_merge($linkArray, $linkFbaiaAndEprintArray);
+              } else {
+                $linkArray = $linkFbaiaAndEprintArray;
+              }
+            }
+          }
+
           if (!strcmp($base_url, $ea_greylit) || !strcmp($base_url, $data_local) || !strcmp($base_url, $env_data)) {
             $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER (regex(str(?collection), "^info:fedora/ealit:collection$", "i") && (regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i") || regex(str(?model), "^info:fedora/fba:library_article_cmodel$", "i") || regex(str(?model), "^info:fedora/fba:library_chapter_cmodel$", "i")))}';
-            $linkArray = get_link_array($linkQuery);
+            $linkEaLitArray = get_link_array($linkQuery);
+            if (count($linkEaLitArray)) {
+              if (count($linkArray)) {
+                $linkArray = array_merge($linkArray, $linkEaLitArray);
+              } else {
+                $linkArray = $linkEaLitArray;
+              }
+            }
           }
 
           if (!strcmp($base_url, $a_salmon_t) || !strcmp($base_url, $data_local) || !strcmp($base_url, $env_data)) {
@@ -703,7 +727,7 @@ class FBAVocabSolutionPack {
               }
             }
 
-            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbaiasub:1695$", "i") || regex(str(?collection), "^info:fedora/fbaia:1697$", "i") || regex(str(?collection), "^info:fedora/fbaia:1700$", "i") || regex(str(?collection), "^info:fedora/fbaia:83$", "i") || regex(str(?collection), "^info:fedora/yyy:collection$", "i")) && (regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i") || regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i")))}';
+            $linkQuery = 'SELECT ?title ?pid WHERE { ?pid <' . PURL_ELEMENTS_URI . 'title> ?title; <fedora-model:state> <fedora-model:Active>; <fedora-model:hasModel> ?model; <fedora-rels-ext:isMemberOfCollection> ?collection; <' . $predicate . '> <info:fedora/' . $this->pid . '> FILTER ((regex(str(?collection), "^info:fedora/fbaiasub:1695$", "i") || regex(str(?collection), "^info:fedora/fbaia:1697$", "i") || regex(str(?collection), "^info:fedora/fbaia:1700$", "i") || regex(str(?collection), "^info:fedora/fbaia:83$", "i") || regex(str(?collection), "^info:fedora/yyy:collection$", "i") || regex(str(?collection), "^info:fedora/fbaia:emkc_collection$", "i") || regex(str(?collection), "^info:fedora/fbaia:pm_collection$", "i")) && (regex(str(?model), "^info:fedora/fba:sp_basic_image$", "i") || regex(str(?model), "^info:fedora/fba:library_monograph_cmodel$", "i")))}';
             $linkFbaiaAndEprintArray = get_link_array($linkQuery);
             if (count($linkFbaiaAndEprintArray)) {
               if (count($linkArray)) {
