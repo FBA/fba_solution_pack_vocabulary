@@ -42,7 +42,7 @@ function _get_html_string_of_object_urls($terms) {
       $termpid = _get_pid_from_authority($term);
       // A quick catch, so that an invalid url isn't put out as a link
       if ($termpid != NULL) {
-        $tempstring.='<a href="' . $base_url . '/fedora/repository/' . $termpid . '">' . $term . '</a>' . '<br/>';
+        $tempstring.='<a href="' . $base_url . '/archive/' . $termpid . '">' . $term . '</a>' . '<br/>';
       }
       else {
         $tempstring.= $term;
@@ -53,7 +53,7 @@ function _get_html_string_of_object_urls($terms) {
     $termpid = _get_pid_from_authority($terms);
     // A quick catch, so that an invalid url isn't put out as a link
     if ($termpid != NULL) {
-      $tempstring.='<a href="' . $base_url . '/fedora/repository/' . $termpid . '">' . $terms . '</a>' . '<br/>';
+      $tempstring.='<a href="' . $base_url . '/archive/' . $termpid . '">' . $terms . '</a>' . '<br/>';
     }
     else {
       $tempstring.= $term;
